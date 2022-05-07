@@ -37,7 +37,7 @@ def getFilesInDirectoryRecursively(folderPath:  str, fileType: str = "") -> list
 
     return outputList
 
-print(getFilesInDirectoryRecursively(r"C:\Users\olliv\Downloads\folder - Copy\# folder", "json"))
+# print(getFilesInDirectoryRecursively(r"C:\Users\olliv\Downloads\folder - Copy\# folder", "json"))
 
 
 def popupWindow(text: str, title: str = softwareName):
