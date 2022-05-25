@@ -3,7 +3,13 @@
 #                                                            #
 # You may use and distribute this software freely.           #
 ##############################################################
+import re
 
+def clean_json(string):
+    string = re.sub(",[ \t\r\n]+}", "}", string)
+    string = re.sub(",[ \t\r\n]+\]", "]", string)
+    string = string.replace("\n", "")
+    return string
 import tkinter as tk
 softwareName = "JsonBatchReplaceImageVariableValuesLastHashtagToNumberFoundInLiteralFileName"
 master = tk.Tk()
@@ -109,18 +115,28 @@ def executeBatchReplacement():
             numbersInFileName = fileNameAsStr[fileNameAsStr.rfind(' ')+1:fileNameAsStr.rfind('.')]
             with open(filePathAsStr) as file:
                 print(f"Reading json file {filePathAsStr}")
-                jsonData = json.load(file)
-                jsonData["image"] =  str(jsonData["image"]).replace('#', numbersInFileName)
-                print(f"""New value of image: {jsonData["image"]}""")
+                jsonData = json.loads(clean_json(str(file.read())))
+                def replaceVariableWithNumbersInFileName(variableName: str):
+                    try:
+                        jsonData[variableName] =  str(jsonData[variableName]).replace('#', numbersInFileName)
+                        print(f"""New value of {variableName}: {jsonData[variableName]}""")
+                    except Exception as exception:
+                        print(f"Exception setting {variableName} variable -> {exception.with_traceback(None)}")
+                replaceVariableWithNumbersInFileName("name")
+                replaceVariableWithNumbersInFileName("image")
+                replaceVariableWithNumbersInFileName("animation_url")
+
             # print("First Name: %s\nLast Name: %s" % (folderDirectory.get(), e2.get()))
             with open(filePathAsStr, 'w+') as file:
                 print(f"Writing to json file {filePathAsStr}")
                 try:
                     json.dump(jsonData, file, indent=1)
                 except Exception as exception:
-                    print(f"Excetion dumping json data to file: {exception}")
-        except:
-            print(f"Unhandled exception when treating file {filePathAsStr}, continuing")
+                    print(f"Excetion dumping json data to file: {exception.with_traceback(None)}")
+        except Exception as exception:
+            import traceback
+            
+            print(f"Unhandled exception when treating file {filePathAsStr}, continuing. Exception was-> {traceback.format_exc()} <-.")
     
 import sys
 class Console(tk.Text):
