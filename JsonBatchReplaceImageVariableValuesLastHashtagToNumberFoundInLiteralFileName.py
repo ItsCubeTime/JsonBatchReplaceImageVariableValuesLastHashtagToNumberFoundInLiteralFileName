@@ -5,10 +5,22 @@
 ##############################################################
 import re
 
-def clean_json(string):
+def clean_json(string:str):
+    string = string.replace("\n", "")
+
+    string = string.strip()
+
+    if string[0] != "{":
+        string = "{" + string
+    if string[-1] != "}":
+        string = string + "}"
+    if string[-2] == ",":
+        string = string[:-2] + "}"
+
     string = re.sub(",[ \t\r\n]+}", "}", string)
     string = re.sub(",[ \t\r\n]+\]", "]", string)
-    string = string.replace("\n", "")
+
+    print(f"\n\njsonAsStr: {string}\n\nJsonAsStr END")
     return string
 import tkinter as tk
 softwareName = "JsonBatchReplaceImageVariableValuesLastHashtagToNumberFoundInLiteralFileName"
@@ -113,6 +125,7 @@ def executeBatchReplacement():
             filePathAsStr = filePathAsStr.replace('\\', '/')
             fileNameAsStr = filePathAsStr[filePathAsStr.rfind('/')+1:]
             numbersInFileName = fileNameAsStr[fileNameAsStr.rfind(' ')+1:fileNameAsStr.rfind('.')]
+            numbersInFileName = re.sub("\D","",numbersInFileName)
             with open(filePathAsStr) as file:
                 print(f"Reading json file {filePathAsStr}")
                 jsonData = json.loads(clean_json(str(file.read())))
